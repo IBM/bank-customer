@@ -1,0 +1,44 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: customer
+  namespace: staging-deployment
+  labels:
+    app: customer
+    service: customer
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: customer
+  type: LoadBalancer
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-app
+  namespace: staging-deployment
+  labels:
+    app: customer
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: customer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: customer
+        version: v1
+    spec:
+      containers:
+      - name: customer
+        image: docker.io/tonyfieit/customer:v0.3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+        - name: tonyfieit75-pull-secret
